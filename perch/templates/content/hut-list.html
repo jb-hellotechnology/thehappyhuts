@@ -1,0 +1,18 @@
+<perch:before>
+<div class="huts">
+	<ul class="hut-list">
+	</perch:before>
+		<li>
+			<perch:repeater id="images" label="Images">
+				<perch:if exists="perch_item_first">
+				<img src="<perch:content id="image" label="Image" type="image" width="480px" />" alt="<perch:content id="name" type="text" label="Name" required title>" />
+				</perch:if>
+			</perch:repeater>
+			<h3><a href="/our-huts/<perch:content id="slug" type="slug" for="name" label="URL segment">"><perch:content id="name" type="text" label="Name" required title></a></h3>
+			<p><perch:content id="short" type="text" /></p>
+			<a class="button" href="/our-huts/<perch:content id="slug" type="slug" for="name" label="URL segment">">View Hut</a>
+		</li>
+	<perch:after>
+	</ul>
+</div>
+</perch:after>

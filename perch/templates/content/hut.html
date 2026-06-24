@@ -1,0 +1,16 @@
+<div class="gallery rectangle">
+	<perch:repeater id="images" label="Images" order="4">
+		<img src="<perch:content id="image" label="Image" type="image" width="480px" />" alt="" />
+	</perch:repeater>
+</div>
+<div class="text">
+	<div class="restrict">
+		<h1><perch:content id="name" type="text" label="Name" required title order="1"></h1>
+		<perch:content id="slug" type="text" label="Slug" suppress="true">
+		<perch:content id="short" type="text" label="Short Description" required suppress="true" order="2">
+		<perch:content id="description" type="textarea" label="Description" html editor="redactor" imagewidth="640" imageheight="480" order="3">
+		<a href="/book" class="button">Check Availability</a>
+	</div>
+</div>
+
+<perch:content id="dog" type="select" options="yes,no" label="Dog Friendly?" suppress="true" />

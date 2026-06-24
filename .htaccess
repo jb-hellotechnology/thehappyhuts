@@ -1,0 +1,16 @@
+Header set X-Frame-Options "ALLOW-FROM www.thehappyhuts.com"
+
+# Block web access to dotenv files (secrets)
+<FilesMatch "^\.env">
+    Require all denied
+</FilesMatch>
+
+RewriteEngine On 
+RewriteCond %{HTTPS} off 
+RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# Perch Runway
+RewriteEngine On
+RewriteCond %{REQUEST_URI} !^/perch 
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule .* /perch/core/runway/start.php [L] 

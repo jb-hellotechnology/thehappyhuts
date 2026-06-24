@@ -1,0 +1,12 @@
+# Local secrets — never commit
+.env
+.env.example
+
+# Composer dependencies (restore with `composer install`)
+/vendor/
+
+# Perch / PHP runtime error logs (some are multiple GB)
+error_log
+
+# macOS
+.DS_Store

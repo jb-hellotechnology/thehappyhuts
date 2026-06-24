@@ -1,0 +1,127 @@
+<perch:blocks>
+	<perch:block type="text" label="Text">
+		<div class="text <perch:content type="select" label="Option" id="option" options="standard,homepage" />" style="background:url('<perch:content type="image" label="Background Photo (Optional)" id="photo" width="1920" height="1280" crop="true" />');background-position: center center;background-size: cover;">
+			<div class="restrict">
+				<div class="wrap">
+					<perch:content id="text" type="textarea" label="Text" html editor="redactor" imagewidth="1280" />
+				</div>
+			</div>
+		</div>
+	</perch:block>
+	<perch:block type="hero" label="Hero">
+		<div class="hero" style="background:url('<perch:content type="image" label="Background Photo" id="photo" width="1920" height="600" crop="true" />');background-position: center center;background-size: cover;">
+			<div class="restrict">
+				<h1><perch:content type="text" id="heading" label="Heading" /></h1>
+			</div>
+		</div>
+	</perch:block>
+	<perch:block type="map" label="Map">
+		<div class="map">
+			<iframe src="https://www.google.com/maps/embed?pb=!1m16!1m12!1m3!1d2402.660135532949!2d0.846734651929066!3d52.97252806024659!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!2m1!1sWells-next-the-Sea%20beach!5e0!3m2!1sen!2suk!4v1619172378841!5m2!1sen!2suk" width="100%" height="450" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+		</div>
+	</perch:block>
+	<perch:block type="contact" label="Contact">
+		<div class="contact">
+			<div class="restrict">
+				<div class="form">
+					<perch:form id="contact" method="post" app="perch_forms" action="#message">
+						<div class="wrap">
+							<perch:content id="text" type="textarea" label="Text" html editor="redactor" imagewidth="1280" />
+							<perch:success show-form="true">
+								<p class="success">
+									<perch:content id="success" type="text" label="Thank you message" />
+								</p>
+							</perch:success>
+							<div class="form-section">
+								<div class="form-input">
+									<label for="name">Name</label>
+									<perch:input type="text" id="name" required label="Name" placeholder="Your Name" />
+								</div>
+								<div class="form-input">
+									<label for="email">Email</label>
+									<perch:input type="email" id="email" required label="Email" placeholder="you@company.com" />
+								</div>
+								<div class="form-input">
+									<label for="phone">Phone</label>
+									<perch:input type="text" id="phone" required label="Phone" placeholder="07..." />
+								</div>
+								<div class="form-input">
+									<label for="message">Message</label>
+									<perch:input type="textarea" id="message" required label="Message" placeholder="Message" />
+								</div>
+								<div class="form-input">
+									<perch:input type="submit" id="submit" value="Send" class="form-button" />
+								</div>
+							</div>
+						</div>
+					</perch:form>
+				</div>
+				<img src="<perch:content type="image" id="image" label="Photo" width="1024px" crop="true" />" alt="Seaside" />
+			</div>
+		</div>
+	</perch:block>
+	<perch:block type="testimonials" label="Testimonials">
+		<div class="testimonials">
+			<a href="javascript:;" class="arrow prev" id="testimonialPrev"><i class="fa fa-chevron-left"></i></a>
+			<a href="javascript:;" class="arrow next" id="testimonialNext"><i class="fa fa-chevron-right"></i></a>
+			<div class="slider">
+			<perch:repeater id="testimonials">
+				<div class="testimonial">
+					<q><perch:content type="text" id="quote" label="Testimonial" /></q>
+				</div>
+			</perch:repeater>
+			</div>
+		</div>
+	</perch:block>
+	<perch:block type="columns" label="Columns">
+		<div class="columns" id="<perch:content type="text" id="anchor" label="Anchor" />">
+			<img src="<perch:content type="image" id="image1" label="Photo 1" width="1024px" crop="true" />" alt="Seaside" />
+			<div class="restrict">
+				<perch:content id="text" type="textarea" label="Text" html editor="redactor" imagewidth="1280" />
+				<perch:if exists="url"><p><a class="button" href="<perch:content id="url" label="Button URL" />"><perch:content id="button" label="Button Text" /></a></p></perch:if>
+			</div>
+			<img src="<perch:content type="image" id="image2" label="Photo 2" width="1024px" crop="true" />" alt="Seaside" />
+		</div>
+	</perch:block>
+	<perch:block type="circles" label="Circle Gallery">
+		<div class="gallery circle">
+			<perch:repeater id="images">
+				<img src="<perch:content type="image" id="image" label="Photo" width="480px" height="480px" crop="true" />" alt="Seaside" />
+			</perch:repeater>
+		</div>
+	</perch:block>
+	<perch:block type="rectangles" label="Rectangle Gallery">
+		<div class="gallery rectangle">
+			<perch:repeater id="images">
+				<img src="<perch:content type="image" id="image" label="Photo" height="480px" crop="true" />" alt="Seaside" />
+			</perch:repeater>
+		</div>
+	</perch:block>
+	<perch:block type="extras" label="Extras Gallery">
+		<div class="gallery">
+			<div class="extras">
+				<a href="javascript:;" class="arrow prev" id="extraPrev"><i class="fa fa-chevron-left"></i></a>
+				<a href="javascript:;" class="arrow next" id="extraNext"><i class="fa fa-chevron-right"></i></a>
+				<div class="items">
+				<perch:repeater id="images">
+					<div>
+						<img src="<perch:content type="image" id="image" label="Photo" width="980px" crop="true" />" alt="Seaside" />
+						<h2><perch:content type="text" id="heading" label="Heading" /></h2>
+						<p><perch:content type="text" id="description" label="Description" /></p>
+						<p><a href="<perch:content type="text" id="link" label="Link" />" target="_blank"><perch:content type="text" id="link" label="Link" /></a></p>
+					</div>
+				</perch:repeater>
+				</div>
+			</div>
+		</div>
+	</perch:block>
+	<perch:block type="social" label="Social Feed">
+		<div class="lightwidget">
+			<ul>
+				<li><a href="https://www.instagram.com/p/CN2oEyTD9bq/" target="_blank"><i class="fa fa-instagram"></i></a></li>
+				<li><a href="https://www.facebook.com/TheHappyHuts/" target="_blank"><i class="fa fa-facebook"></i></a></li>
+			</ul>
+		<!-- LightWidget WIDGET --><script src="https://cdn.lightwidget.com/widgets/lightwidget.js"></script><iframe src="https://cdn.lightwidget.com/widgets/072ce4eccf855371814e7167775d2830.html" scrolling="no" allowtransparency="true" class="lightwidget-widget" style="width:100%;border:0;overflow:hidden;"></iframe>
+		</div>
+	</perch:block>
+</perch:blocks>
