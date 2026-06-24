@@ -877,8 +877,13 @@ class Simple_Calendars extends PerchAPI_Factory
   public function useVoucher($code,$email,$balance){
 	  if($balance==0){
 	  	$date = date('Y-m-d H:i:s');
+	  }else{
+	  	// Partial use: a balance remains, so keep the voucher usable by leaving
+	  	// usedDate as the "unused" sentinel. (An empty string here is rejected
+	  	// under MySQL strict mode, which silently broke the whole UPDATE.)
+	  	$date = '0000-00-00 00:00:00';
 	  }
-	  $sql = 'UPDATE simple_calendar_vouchers SET voucherValue="'.$balance.'", usedDate="'.$date.'", usedBy="'.$email.'" WHERE voucherCode="'.$code.'"'; 
+	  $sql = 'UPDATE simple_calendar_vouchers SET voucherValue="'.$balance.'", usedDate="'.$date.'", usedBy="'.$email.'" WHERE voucherCode="'.$code.'"';
 	  $data = $this->db->execute($sql);
   }
   
