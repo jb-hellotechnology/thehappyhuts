@@ -328,7 +328,7 @@
     
 		echo "<table class='cal-table'>
             <tr>
-              <td colspan='7' class='larger'>$name | $dogFriendly</td>
+              <td colspan='7' class='larger'>$name &bull; $dogFriendly</td>
             </tr>
 		        <tr class='cal-month'>
 		            <td colspan='7'>
