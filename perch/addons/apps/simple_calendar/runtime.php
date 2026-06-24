@@ -354,12 +354,29 @@
 			        $thisDay = date("D", mktime(0, 0, 0, $month, $day, $year));
 			        
 			        date_default_timezone_set('Europe/London');
-			        
+
+			        // Performance: the availability rule and the bookings list are the
+			        // same for every day in this month, so fetch them ONCE (on the first
+			        // iteration) instead of running 2-3 SQL queries per day per unit.
+			        if(!isset($monthBookings)){
+			            $availability  = $SimpleCalendar->getAvailabilityMonth(date("F", mktime(0, 0, 0, $month, 1, 1997)));
+			            $monthStart    = date("Y-m-d", mktime(0, 0, 0, $month, 1, $year))." 12:00:00";
+			            $monthEnd      = date("Y-m-d", mktime(0, 0, 0, $month, $maxday, $year))." 23:59:00";
+			            $monthBookings = $SimpleCalendar->bookingsForUnitInRange($unitData['unitID'], $monthStart, $monthEnd);
+			        }
+
 			        $limitDate = date("Y-m-d", mktime(0, 0, 0, date('m')+12, 0, date('Y')));
 					$todayDate = date("Y-m-d 08:00:00");
-			        
-			        $unitData = $SimpleCalendar->unitSlug($unit);
-					$rows = $SimpleCalendar->bookingCheck($unitData['unitID'],$curDate);
+
+			        // Is this day booked? Same rule as the old bookingCheck() query,
+			        // now evaluated in PHP against the pre-fetched list (no per-day DB hit).
+			        $rows = 0;
+			        foreach($monthBookings as $b){
+			            if($b['startTime'] <= ($curDate." 23:59:00") && $b['endTime'] >= ($curDate." 12:00:00")){
+			                $rows = 1;
+			                break;
+			            }
+			        }
 					
 					if($rows>0){
 						$date_class = " class='un'";
@@ -372,8 +389,7 @@
             
             $date_class = " class='av'";
 
-		    $monthText = date("F", mktime(0, 0, 0, $month, 1, 1997));
-		    $availability = $SimpleCalendar->getAvailabilityMonth($monthText);
+		    // ($availability is now fetched once, at the top of the day loop)
 
             if($i < $startday){
               echo "$tabs\t\t<td></td>";
@@ -418,9 +434,13 @@
 			
 		echo '<script type="text/javascript">
 			function month(year,month,unit){
-				$( ".monthly-calendar-all" ).load( \'/perch/templates/simple_calendar/monthly-calendar-all.php?unit=\'+unit+\'&year=\'+year+\'&month=\'+month );	
+				var $cal = $(".monthly-calendar-all");
+				$cal.addClass("is-loading");
+				$cal.load( \'/perch/templates/simple_calendar/monthly-calendar-all.php?unit=\'+unit+\'&year=\'+year+\'&month=\'+month, function(){
+					$cal.removeClass("is-loading");
+				} );
 			}
-		</script>';	
+		</script>';
 		
 		}
 		

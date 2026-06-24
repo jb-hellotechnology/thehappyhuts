@@ -596,11 +596,22 @@ class Simple_Calendars extends PerchAPI_Factory
     
     public function bookingCheck($unit,$date){
 	    
-	    $sql = 'SELECT * FROM simple_calendar_accommodation_bookings WHERE unitID="'.$unit.'" AND startTime<="'.$date.' 23:59:00" AND endTime>="'.$date.' 12:00:00"';  
+	    $sql = 'SELECT * FROM simple_calendar_accommodation_bookings WHERE unitID="'.$unit.'" AND startTime<="'.$date.' 23:59:00" AND endTime>="'.$date.' 12:00:00"';
 		$rows = $this->db->get_count($sql);
-		
+
 		return $rows;
-	    
+
+    }
+
+    // Fetch every booking that overlaps a date range for one unit in a single
+    // query, so the caller can test many days in PHP instead of one query per day.
+    public function bookingsForUnitInRange($unitID,$rangeStart,$rangeEnd){
+
+	    $sql = 'SELECT startTime, endTime FROM simple_calendar_accommodation_bookings WHERE unitID="'.$unitID.'" AND startTime<="'.$rangeEnd.'" AND endTime>="'.$rangeStart.'"';
+		$data = $this->db->get_rows($sql);
+
+		return $data;
+
     }
   
   public function isArrival($slug,$date){

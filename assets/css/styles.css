@@ -649,6 +649,43 @@ ul.hut-list li img{
 	max-width:1280px;
 	margin:0 auto;
 	display:block;
+	position:relative;
+}
+
+/* Month-navigation loading state: blur the calendars and show a spinner while
+   the next/previous month is fetched via AJAX (toggled by month() in runtime.php) */
+.monthly-calendar-all.is-loading > *{
+	filter:blur(3px);
+	opacity:0.55;
+	pointer-events:none;
+	transition:filter .15s ease, opacity .15s ease;
+}
+.monthly-calendar-all.is-loading::before{
+	content:"";
+	position:absolute;
+	top:0;
+	left:0;
+	right:0;
+	bottom:0;
+	background:rgba(255,255,255,0.35);
+	z-index:50;
+}
+.monthly-calendar-all.is-loading::after{
+	content:"";
+	position:fixed;
+	top:50%;
+	left:50%;
+	width:54px;
+	height:54px;
+	margin:-27px 0 0 -27px;
+	border:5px solid rgba(140,160,67,0.25);
+	border-top-color:#8CA043;
+	border-radius:50%;
+	animation:hh-cal-spin .8s linear infinite;
+	z-index:9999;
+}
+@keyframes hh-cal-spin{
+	to{transform:rotate(360deg);}
 }
 
 table{border:1px solid #ccc;margin-bottom:2rem;font-size:0.9rem;font-weight:400;}
