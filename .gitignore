@@ -2,6 +2,9 @@
 .env
 .env.example
 
+# Perch config (DB credentials, license key) — environment-specific, keep on server only
+/perch/config/config*
+
 # Composer dependencies (restore with `composer install`)
 /vendor/
 
