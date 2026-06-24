@@ -1550,6 +1550,26 @@ function check_voucher_code($code){
 	return $voucherCode;
 }
 
+// Returns true if a voucher (by its stored "units" value) may be used for the
+// hut attached to a given temp-booking reference. 'all' or blank = any hut.
+function voucher_unit_allowed($voucherUnits, $reference){
+	$voucherUnits = trim((string)$voucherUnits);
+	if($voucherUnits=='' || strtolower($voucherUnits)=='all'){
+		return true;
+	}
+
+	$API = new Simple_Calendars($API);
+	$SimpleCalendar = new Simple_Calendars($API);
+
+	$booking = $SimpleCalendar->getByReference($reference);
+	if(!is_array($booking) || !isset($booking['unitID'])){
+		return false;
+	}
+
+	$allowed = array_map('trim', explode(',', $voucherUnits));
+	return in_array((string)$booking['unitID'], $allowed);
+}
+
 function smsContent(){
   $API = new Simple_Calendars($API);
   $SimpleCalendar = new Simple_Calendars($API);

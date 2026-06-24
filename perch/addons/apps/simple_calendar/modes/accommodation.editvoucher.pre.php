@@ -7,8 +7,10 @@
     $HTML     = $API->get('HTML');
     $Form     = $API->get('Form');
     $Text     = $API->get('Text');
-    
-    if ($Form->submitted()) {  
+
+    $SimpleCalendar->ensureVoucherUnitsColumn();
+
+    if ($Form->submitted()) {
 		
 		$data = $_POST;
 		$SimpleCalendar->voucherUpdate($data);	
@@ -17,3 +19,7 @@
     }
     
     $voucher = $SimpleCalendar->giftvoucher($_GET['id']);
+
+    $units = $SimpleCalendar->getAccUnit(0);
+    $voucherUnits  = isset($voucher['units']) ? trim($voucher['units']) : 'all';
+    $selectedUnits = ($voucherUnits=='' || strtolower($voucherUnits)=='all') ? array() : array_map('trim', explode(',', $voucherUnits));

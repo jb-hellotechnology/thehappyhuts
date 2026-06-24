@@ -343,12 +343,27 @@ class Simple_Calendars extends PerchAPI_Factory
     
     public function getBookings(){
 	    
-		$sql = 'SELECT * FROM simple_calendar_accommodation_bookings WHERE reference="" OR reference is NULL ORDER BY bookingID ASC';  
-	   
+		$sql = 'SELECT * FROM simple_calendar_accommodation_bookings WHERE reference="" OR reference is NULL ORDER BY bookingID ASC';
+
 		$data = $this->db->get_rows($sql);
 
 	    return $data;
-	    
+
+    }
+
+    // Sum confirmed-booking value per unit for a date range, grouped in SQL so it
+    // stays fast as the bookings table grows. The range is matched against the
+    // arrival time (startTime). Pending/expired holds are excluded the same way
+    // getBookings() does (empty/NULL reference). Swap SUM(cost) for SUM(paid) to
+    // report money actually received instead of gross booking value.
+    public function getMonthlySalesByUnit($rangeStart,$rangeEnd){
+
+		$sql = 'SELECT unitID, COUNT(*) AS bookings, SUM(cost) AS total FROM simple_calendar_accommodation_bookings WHERE startTime>="'.$rangeStart.'" AND startTime<="'.$rangeEnd.'" AND (reference="" OR reference IS NULL) GROUP BY unitID';
+
+		$data = $this->db->get_rows($sql);
+
+	    return $data;
+
     }
     
     public function getFutureBookings(){
@@ -801,7 +816,12 @@ class Simple_Calendars extends PerchAPI_Factory
   }
   
   public function voucherAdd($data){
-	  $sql = 'INSERT INTO simple_calendar_vouchers (voucherCode, voucherValue) VALUES ("'.$data['voucherCode'].'", "'.$data['voucherValue'].'")';
+	  $units = $this->voucherUnitsFromInput($data);
+	  // Provide the NOT NULL columns that have no DB default so the INSERT works
+	  // under MySQL strict mode. '0000-00-00 00:00:00' is the "not yet used"
+	  // sentinel the rest of the app checks usedDate against.
+	  $createdDate = date('Y-m-d H:i:s');
+	  $sql = 'INSERT INTO simple_calendar_vouchers (voucherCode, voucherValue, units, createdDate, usedDate, usedBy) VALUES ("'.$data['voucherCode'].'", "'.$data['voucherValue'].'", "'.$units.'", "'.$createdDate.'", "0000-00-00 00:00:00", "")';
 	  $data = $this->db->execute($sql);
 
 	  return $data;
@@ -815,8 +835,29 @@ class Simple_Calendars extends PerchAPI_Factory
   }
   
   public function voucherUpdate($data){
-	  $sql = 'UPDATE simple_calendar_vouchers SET voucherValue="'.$data['voucherValue'].'", voucherCode="'.$data['voucherCode'].'" WHERE voucherID="'.$data['voucherID'].'"'; 
+	  $units = $this->voucherUnitsFromInput($data);
+	  $sql = 'UPDATE simple_calendar_vouchers SET voucherValue="'.$data['voucherValue'].'", voucherCode="'.$data['voucherCode'].'", units="'.$units.'" WHERE voucherID="'.$data['voucherID'].'"';
 	  $data = $this->db->execute($sql);
+  }
+
+  // Build the stored "units" value from a submitted voucher form: 'all' when no
+  // specific huts are ticked, otherwise a comma-separated list of unit IDs.
+  public function voucherUnitsFromInput($data){
+	  if(isset($data['units']) && is_array($data['units']) && count($data['units'])>0){
+		  $ids = array();
+		  foreach($data['units'] as $u){ $ids[] = (int)$u; }
+		  return implode(',', $ids);
+	  }
+	  return 'all';
+  }
+
+  // Ensure the vouchers table has the "units" column this feature relies on.
+  // Safe to call repeatedly; it only alters the table the first time.
+  public function ensureVoucherUnitsColumn(){
+	  $exists = $this->db->get_row("SHOW COLUMNS FROM simple_calendar_vouchers LIKE 'units'");
+	  if(!$exists){
+		  $this->db->execute("ALTER TABLE simple_calendar_vouchers ADD units VARCHAR(255) NOT NULL DEFAULT 'all'");
+	  }
   }
   
   public function voucherDelete($id){

@@ -52,7 +52,17 @@
 	echo $Form->text_field("voucherCode","Voucher Code (letters and numbers only)",$voucher['voucherCode']);
 		
 	echo $Form->text_field("voucherValue","Voucher Value (no £ sign)",$voucher['voucherValue']);
-	    
+
+	// Unit restriction: none ticked = valid for all huts
+	echo '<div style="margin:1rem 0;">';
+	echo '<label class="label" style="display:block;font-weight:bold;margin-bottom:.25rem;">Restrict to Specific Huts</label>';
+	echo '<p style="margin:.25rem 0 .75rem;">Leave all unticked to allow this voucher on <strong>any</strong> hut, or tick one or more huts to limit it to those only.</p>';
+	foreach($units as $unit){
+		$checked = in_array((string)$unit['unitID'], $selectedUnits) ? ' checked="checked"' : '';
+		echo '<label style="display:block;margin:.3rem 0;font-weight:normal;"><input type="checkbox" name="units[]" value="'.(int)$unit['unitID'].'"'.$checked.' /> '.$HTML->encode($unit['name']).'</label>';
+	}
+	echo '</div>';
+
 	echo $Form->submit_field('btnSubmit', 'Update Gift Voucher', $API->app_path());
 	
 	echo $Form->hidden('voucherID', $_GET['id']);

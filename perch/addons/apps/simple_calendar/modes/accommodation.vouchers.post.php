@@ -55,7 +55,8 @@
             <tr>
                 <th class="first">Date Created</th>
                 <th>Voucher Code</th> 
-                <th>Voucher Value</th> 
+                <th>Voucher Value</th>
+                <th>Huts</th>
                 <th>Used Date</th>
                 <th>Used By</th> 
                 <th class="action last">Delete</th>
@@ -74,6 +75,19 @@
 	            </td>
 	            <td>
 	                <?php echo $Voucher['voucherValue']; ?>
+	            </td>
+	            <td>
+<?php
+	                $vu = isset($Voucher['units']) ? trim($Voucher['units']) : 'all';
+	                if($vu=='' || strtolower($vu)=='all'){
+	                    $vuLabel = 'All huts';
+	                }else{
+	                    $names = array();
+	                    foreach(explode(',', $vu) as $id){ $id = trim($id); $names[] = isset($unitNames[$id]) ? $unitNames[$id] : ('#'.$id); }
+	                    $vuLabel = implode(', ', $names);
+	                }
+?>
+	                <?php echo $HTML->encode($vuLabel); ?>
 	            </td>
 	            <td>
 	                <?php echo $Voucher['usedDate']; ?>

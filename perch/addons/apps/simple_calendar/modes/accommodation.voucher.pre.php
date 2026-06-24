@@ -7,8 +7,11 @@
     $HTML     = $API->get('HTML');
     $Form     = $API->get('Form');
     $Text     = $API->get('Text');
-    
-    if ($Form->submitted()) {  
+
+    $SimpleCalendar->ensureVoucherUnitsColumn();
+    $units = $SimpleCalendar->getAccUnit(0);
+
+    if ($Form->submitted()) {
 		
 		$data = $_POST;
 		$SimpleCalendar->voucherAdd($data);	
