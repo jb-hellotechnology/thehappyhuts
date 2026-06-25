@@ -117,13 +117,25 @@
           
           echo ' <div id="voucher">
 	        <h3>Voucher Code?</h3>
-	        <p>Use this form to apply your voucher code to your booking. You can apply as many voucher codes as you like.</p>
+	        <p>Use this form to apply your voucher code to your booking.</p>
 	        <div class="form-input">
 		        <label>Voucher Code</label>
 		        <input type="text" name="voucherCode" id="voucherCode" />
 	        </div>
 	        <div class="form-input">
 		        <a class="button" onclick="javascript:applyVoucher();">Apply to Booking</a>
+	        </div>
+        </div> ';
+
+        echo ' <div id="promo">
+	        <h3>Promotional Code?</h3>
+	        <p>Got a promotional code? Enter it here to apply your discount.</p>
+	        <div class="form-input">
+		        <label>Promo Code</label>
+		        <input type="text" name="promoCode" id="promoCode" />
+	        </div>
+	        <div class="form-input">
+		        <a class="button" onclick="javascript:applyPromo();">Apply to Booking</a>
 	        </div>
         </div> ';
         
@@ -187,6 +199,14 @@
 	          
 	          //setAmount();
 	          
+	          function applyPromo(){
+		      	var pPromoCode = $('#promoCode').val();
+		      	var pReference = $('#reference').val();
+		      	$.post( "/embed/book/apply-promo-code?" + Math.random(), { promoCode: pPromoCode, reference: pReference }).done(function( data ) {
+	            	alert(data);
+	            	setAmount();
+	            });
+	          }
 	          function applyVoucher(){
 		      	var pVoucherCode = $('#voucherCode').val();
 		      	var pReference = $('#reference').val();

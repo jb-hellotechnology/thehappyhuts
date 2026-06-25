@@ -1,5 +1,6 @@
 <?php
 	unset($_SESSION['voucherCode']);
+	unset($_SESSION['promoCode']);
 ?>
 <?php perch_layout('embed_header_no_image'); ?>
 <?php perch_content('Page Content'); ?>

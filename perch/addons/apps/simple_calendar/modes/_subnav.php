@@ -15,4 +15,8 @@
             'page' => 'simple_calendar/giftvouchers',
             'label'=> 'Gift Vouchers'
         ],
+        [
+            'page' => 'simple_calendar/promocodes',
+            'label'=> 'Promotional Codes'
+        ],
     ], $CurrentUser);

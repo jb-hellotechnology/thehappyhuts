@@ -519,5 +519,12 @@
     "Next": "Next",
     "Month": "Month",
     "Year": "Year",
-    "Unit pricing updated - <a href=\"\/perch\/addons\/apps\/simple_calendar\/accommodation\/units\/edit\/?id=14\">return to unit<\/a>": "Unit pricing updated - <a href=\"\/perch\/addons\/apps\/simple_calendar\/accommodation\/units\/edit\/?id=14\">return to unit<\/a>"
+    "Unit pricing updated - <a href=\"\/perch\/addons\/apps\/simple_calendar\/accommodation\/units\/edit\/?id=14\">return to unit<\/a>": "Unit pricing updated - <a href=\"\/perch\/addons\/apps\/simple_calendar\/accommodation\/units\/edit\/?id=14\">return to unit<\/a>",
+    "Promotional Codes": "Promotional Codes",
+    "Promotional Code": "Promotional Code",
+    "Add a Promotional Code": "Add a Promotional Code",
+    "Code (letters and numbers only, e.g. WELCOME10)": "Code (letters and numbers only, e.g. WELCOME10)",
+    "Percentage Off (number only, e.g. 10)": "Percentage Off (number only, e.g. 10)",
+    "Add Promotional Code": "Add Promotional Code",
+    "Promotional code added": "Promotional code added"
 }

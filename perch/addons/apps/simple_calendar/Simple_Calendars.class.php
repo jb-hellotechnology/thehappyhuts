@@ -359,9 +359,10 @@ class Simple_Calendars extends PerchAPI_Factory
     }
     
     public function bookingAdd($booking){
-	    
+
+	    $booking = $this->fillRequiredBookingDefaults($booking);
 	    $insert = $this->db->insert('simple_calendar_accommodation_bookings', $booking);
-	    
+
     }
     
     public function getBookings(){
@@ -773,6 +774,7 @@ class Simple_Calendars extends PerchAPI_Factory
       $booking['cost'] = $cost;
       $booking['paid'] = $paid;
 
+	  $booking = $this->fillRequiredBookingDefaults($booking);
 	  $insert = $this->db->insert('simple_calendar_accommodation_bookings', $booking);
   }
   
@@ -812,9 +814,41 @@ class Simple_Calendars extends PerchAPI_Factory
 	  $booking['reference'] = uniqid();
 	  $booking['expires'] = date("Y-m-d H:i:s", mktime(date('H'), date('i'), date('s')+230, date('m'), date('d'), date('Y')));
 
+	  // Strict mode rejects an INSERT that omits NOT NULL columns without a default.
+	  // Fill any such columns with type-appropriate empty values before inserting.
+	  $booking = $this->fillRequiredBookingDefaults($booking);
+
 	  $insert = $this->db->insert('simple_calendar_accommodation_bookings', $booking);
 	  
 	  return $booking['reference'];
+  }
+
+  // Returns $booking with type-appropriate empty values added for every NOT NULL
+  // column on the bookings table that has no default and isn't already set, so
+  // partial inserts (e.g. hold bookings) succeed under MySQL strict mode. This
+  // mirrors what non-strict MySQL did implicitly.
+  public function fillRequiredBookingDefaults($booking){
+	  $cols = $this->db->get_rows("SHOW COLUMNS FROM simple_calendar_accommodation_bookings");
+	  if(!is_array($cols)) return $booking;
+	  foreach($cols as $col){
+		  $field = $col['Field'];
+		  if(array_key_exists($field, $booking)) continue;   // already provided
+		  if($col['Extra']=='auto_increment')    continue;   // primary key
+		  if($col['Null']=='YES')                continue;   // nullable, can be omitted
+		  if($col['Default']!==null)             continue;   // has a default, can be omitted
+		  // NOT NULL, no default, not set: pick a safe empty value by column type.
+		  $type = strtolower($col['Type']);
+		  if(strpos($type,'int')!==false || strpos($type,'decimal')!==false || strpos($type,'float')!==false || strpos($type,'double')!==false){
+			  $booking[$field] = 0;
+		  }elseif(strpos($type,'datetime')!==false || strpos($type,'timestamp')!==false || strpos($type,'date')!==false){
+			  $booking[$field] = '0000-00-00 00:00:00';
+		  }elseif(strpos($type,'time')!==false){
+			  $booking[$field] = '00:00:00';
+		  }else{
+			  $booking[$field] = '';
+		  }
+	  }
+	  return $booking;
   }
   
   public function getLastBooking(){
@@ -881,6 +915,64 @@ class Simple_Calendars extends PerchAPI_Factory
 	  if(!$exists){
 		  $this->db->execute("ALTER TABLE simple_calendar_vouchers ADD units VARCHAR(255) NOT NULL DEFAULT 'all'");
 	  }
+  }
+
+  /* ===== Promotional Codes =====================================================
+     Reusable percentage discounts (e.g. WELCOME10 = 10% off), separate from the
+     single-use £ gift vouchers. A code runs until deleted and can be used by any
+     number of customers. Like vouchers, it applies to 'all' huts or a specific
+     comma-separated list of unit IDs (reusing voucherUnitsFromInput()).
+  ============================================================================= */
+
+  // Create the promo-codes table and the bookings.promoCode column if missing.
+  // Safe to call repeatedly.
+  public function ensurePromoSchema(){
+	  $this->db->execute("CREATE TABLE IF NOT EXISTS simple_calendar_promocodes (promoID INT NOT NULL AUTO_INCREMENT, name VARCHAR(255) NOT NULL DEFAULT '', percentage DECIMAL(5,2) NOT NULL DEFAULT '0.00', units VARCHAR(255) NOT NULL DEFAULT 'all', createdDate DATETIME NULL DEFAULT NULL, PRIMARY KEY (promoID))");
+	  $exists = $this->db->get_row("SHOW COLUMNS FROM simple_calendar_accommodation_bookings LIKE 'promoCode'");
+	  if(!$exists){
+		  $this->db->execute("ALTER TABLE simple_calendar_accommodation_bookings ADD promoCode VARCHAR(255) NOT NULL DEFAULT ''");
+	  }
+  }
+
+  public function getPromos(){
+	  return $this->db->get_rows('SELECT * FROM simple_calendar_promocodes ORDER BY createdDate DESC');
+  }
+
+  public function getPromo($id){
+	  return $this->db->get_row('SELECT * FROM simple_calendar_promocodes WHERE promoID="'.(int)$id.'"');
+  }
+
+  public function getPromoByCode($code){
+	  $code = addslashes($code);
+	  return $this->db->get_row('SELECT * FROM simple_calendar_promocodes WHERE name="'.$code.'"');
+  }
+
+  public function promoAdd($data){
+	  $promo = array();
+	  $promo['name']        = $data['name'];
+	  $promo['percentage']  = (float) $data['percentage'];
+	  $promo['units']       = $this->voucherUnitsFromInput($data);
+	  $promo['createdDate'] = date('Y-m-d H:i:s');
+	  $this->db->insert('simple_calendar_promocodes', $promo);
+  }
+
+  public function promoUpdate($data){
+	  $promo = array();
+	  $promo['name']       = $data['name'];
+	  $promo['percentage'] = (float) $data['percentage'];
+	  $promo['units']      = $this->voucherUnitsFromInput($data);
+	  $this->db->update('simple_calendar_promocodes', $promo, 'promoID', $data['promoID']);
+  }
+
+  public function promoDelete($id){
+	  $this->db->execute('DELETE FROM simple_calendar_promocodes WHERE promoID="'.(int)$id.'"');
+  }
+
+  // Record which promo code was applied to a booking (for the owner's records).
+  public function applyPromoToBooking($code, $reference){
+	  $booking = array();
+	  $booking['promoCode'] = $code;
+	  $this->db->update('simple_calendar_accommodation_bookings', $booking, 'reference', $reference);
   }
   
   public function voucherDelete($id){

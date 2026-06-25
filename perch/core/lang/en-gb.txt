@@ -486,5 +486,6 @@
     "Log into your %sPerch account%s and add the following as your <em>live<\/em> or <em>testing<\/em> domain:": "Log into your %sPerch account%s and add the following as your <em>live<\/em> or <em>testing<\/em> domain:",
     "Thank you. Now check your email for the link.": "Thank you. Now check your email for the link.",
     "If you do not receive an email, look in your spam folder and also check that the email address you have used is the one we have for you.": "If you do not receive an email, look in your spam folder and also check that the email address you have used is the one we have for you.",
-    "%sLog in%s %sTry again%s": "%sLog in%s %sTry again%s"
+    "%sLog in%s %sTry again%s": "%sLog in%s %sTry again%s",
+    "Promotional Codes": "Promotional Codes"
 }

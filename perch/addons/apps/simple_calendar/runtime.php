@@ -669,6 +669,14 @@ function getPrice($nights,$unit,$arrival){
       $night++;
     }
     
+    // PROMOTIONAL CODE (percentage off the accommodation total, applied before any voucher)
+    if(isset($_SESSION['promoCode']) && $_SESSION['promoCode']!=''){
+	    $promo = $SimpleCalendar->getPromoByCode($_SESSION['promoCode']);
+	    if($promo && $promo['percentage']>0){
+		    $totalPrice = $totalPrice - ($totalPrice * ($promo['percentage']/100));
+	    }
+    }
+
     // VOUCHER CODES
     $discount = 0;
     foreach($_SESSION['voucherCode'] AS $code){
@@ -677,7 +685,7 @@ function getPrice($nights,$unit,$arrival){
 	    	$discount = $discount+$voucherCode['voucherValue'];
 	    }
 	}
-    
+
     $deposit = $totalPrice;
   
     $toPay = $deposit*100;
@@ -940,6 +948,14 @@ function getPriceValue($nights,$unit,$arrival,$return){
       $night++;
     }
     
+    // PROMOTIONAL CODE (percentage off the accommodation total, applied before any voucher)
+    if(isset($_SESSION['promoCode']) && $_SESSION['promoCode']!=''){
+	    $promo = $SimpleCalendar->getPromoByCode($_SESSION['promoCode']);
+	    if($promo && $promo['percentage']>0){
+		    $totalPrice = $totalPrice - ($totalPrice * ($promo['percentage']/100));
+	    }
+    }
+
     // VOUCHER CODES
     $discount = 0;
     foreach($_SESSION['voucherCode'] AS $code){
@@ -948,7 +964,7 @@ function getPriceValue($nights,$unit,$arrival,$return){
 	    	$discount = $discount+$voucherCode['voucherValue'];
 	    }
 	}
-    
+
     $deposit = $totalPrice-$discount;
   
     $toPay = $deposit*100;
@@ -1568,6 +1584,22 @@ function voucher_unit_allowed($voucherUnits, $reference){
 
 	$allowed = array_map('trim', explode(',', $voucherUnits));
 	return in_array((string)$booking['unitID'], $allowed);
+}
+
+// ===== Promotional codes (reusable percentage discounts) =====
+
+function check_promo_code($code){
+	$API = new Simple_Calendars($API);
+	$SimpleCalendar = new Simple_Calendars($API);
+	$SimpleCalendar->ensurePromoSchema();
+	return $SimpleCalendar->getPromoByCode($code);
+}
+
+function apply_promo_code($code, $reference){
+	$API = new Simple_Calendars($API);
+	$SimpleCalendar = new Simple_Calendars($API);
+	$SimpleCalendar->ensurePromoSchema();
+	$SimpleCalendar->applyPromoToBooking($code, $reference);
 }
 
 function smsContent(){
