@@ -66,8 +66,19 @@
 		
 			echo $Form->form_start();
 			
-			echo $Form->date_field("startDate","Start Date");
-			echo $Form->date_field("endDate","End Date");
+			// Pricing period auto-spans a whole calendar month — the manager just
+			// picks a month + year and enters the prices.
+			$monthList = array();
+			for($m=1;$m<=12;$m++){
+				$monthList[] = array('label'=>date('F', mktime(0,0,0,$m,1,2000)), 'value'=>(string)$m);
+			}
+			$thisYear = (int)date('Y');
+			$yearList = array();
+			for($y=$thisYear-1;$y<=$thisYear+5;$y++){
+				$yearList[] = array('label'=>(string)$y, 'value'=>(string)$y);
+			}
+			echo $Form->select_field("month","Month",$monthList,date('n'));
+			echo $Form->select_field("year","Year",$yearList,date('Y'));
 /*
 			echo $Form->text_field("freeText","Free Text");
 			

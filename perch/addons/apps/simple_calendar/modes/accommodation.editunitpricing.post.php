@@ -66,8 +66,26 @@
 		
 			echo $Form->form_start();
 			
-			echo $Form->date_field("startDate","Start Date",$unitPricing['startDate']);
-			echo $Form->date_field("endDate","End Date",$unitPricing['endDate']);
+			// Pre-select month + year from the saved start date; the period
+			// auto-spans the whole calendar month on save.
+			$startTs = strtotime($unitPricing['startDate']);
+			if(!$startTs){ $startTs = time(); }
+			$existingMonth = date('n', $startTs);
+			$existingYear  = date('Y', $startTs);
+
+			$monthList = array();
+			for($m=1;$m<=12;$m++){
+				$monthList[] = array('label'=>date('F', mktime(0,0,0,$m,1,2000)), 'value'=>(string)$m);
+			}
+			$thisYear  = (int)date('Y');
+			$startYear = min($thisYear-1, (int)$existingYear);
+			$endYear   = max($thisYear+5, (int)$existingYear);
+			$yearList = array();
+			for($y=$startYear;$y<=$endYear;$y++){
+				$yearList[] = array('label'=>(string)$y, 'value'=>(string)$y);
+			}
+			echo $Form->select_field("month","Month",$monthList,$existingMonth);
+			echo $Form->select_field("year","Year",$yearList,$existingYear);
 /*
 			echo $Form->text_field("freeText","Free Text",$unitPricing['freeText']);
 			

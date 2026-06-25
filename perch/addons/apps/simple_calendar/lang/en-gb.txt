@@ -516,5 +516,7 @@
     "Availability Updated": "Availability Updated",
     "Sales Summary": "Sales Summary",
     "Previous": "Previous",
-    "Next": "Next"
+    "Next": "Next",
+    "Month": "Month",
+    "Year": "Year"
 }

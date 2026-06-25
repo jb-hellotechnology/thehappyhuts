@@ -110,8 +110,12 @@ class Simple_Calendars extends PerchAPI_Factory
 	    
 	    $pricing = array();
 	    $pricing['unitID'] = $data['unitID'];
-	    $pricing['startDate'] = "$data[startDate_year]-$data[startDate_month]-$data[startDate_day]";
-	    $pricing['endDate'] = "$data[endDate_year]-$data[endDate_month]-$data[endDate_day]";
+	    // The pricing period now spans a whole calendar month: derive the first
+	    // and last day from the submitted month + year.
+	    $month = (int) $data['month'];
+	    $year  = (int) $data['year'];
+	    $pricing['startDate'] = sprintf('%04d-%02d-01', $year, $month);
+	    $pricing['endDate']   = sprintf('%04d-%02d-%02d', $year, $month, (int) date('t', mktime(0, 0, 0, $month, 1, $year)));
 /*
 	    $pricing['freeText'] = $data['freeText'];
 	    $pricing['minStay'] = $data['minStay'];
@@ -129,6 +133,21 @@ class Simple_Calendars extends PerchAPI_Factory
 	    $pricing['sevennights'] = $data['sevennights'];
 */
 
+	    // These legacy columns are NOT NULL with no default, so set them explicitly
+	    // (empty / zero) — required under MySQL strict mode. The booking flow only
+	    // uses the weekday (onenight) and weekend (twonights) prices; the rest are
+	    // unused price tiers / changeover options.
+	    $pricing['freeText']    = '';
+	    $pricing['minStay']     = '0';
+	    $pricing['changeOver']  = '';
+	    $pricing['strict']      = '';
+	    $pricing['discount']    = '';
+	    $pricing['threenights'] = '0.00';
+	    $pricing['fournights']  = '0.00';
+	    $pricing['fivenights']  = '0.00';
+	    $pricing['sixnights']   = '0.00';
+	    $pricing['sevennights'] = '0.00';
+
 	    $insert = $this->db->insert('simple_calendar_accommodation_unit_pricing', $pricing);
 	    
     }
@@ -136,8 +155,12 @@ class Simple_Calendars extends PerchAPI_Factory
     public function updateunitPrice($data){
 	    
 	    $pricing = array();
-	    $pricing['startDate'] = "$data[startDate_year]-$data[startDate_month]-$data[startDate_day]";
-	    $pricing['endDate'] = "$data[endDate_year]-$data[endDate_month]-$data[endDate_day]";
+	    // The pricing period now spans a whole calendar month: derive the first
+	    // and last day from the submitted month + year.
+	    $month = (int) $data['month'];
+	    $year  = (int) $data['year'];
+	    $pricing['startDate'] = sprintf('%04d-%02d-01', $year, $month);
+	    $pricing['endDate']   = sprintf('%04d-%02d-%02d', $year, $month, (int) date('t', mktime(0, 0, 0, $month, 1, $year)));
 /*
 	    $pricing['freeText'] = $data['freeText'];
 	    $pricing['minStay'] = $data['minStay'];
