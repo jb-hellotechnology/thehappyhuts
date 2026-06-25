@@ -103,6 +103,8 @@
 				echo $HTML->encode($API->app_path());
 				echo "/accommodation/units/pricing/edit/?id=";
 				echo $HTML->encode(urlencode($price['pricingID']));
+				echo "&unit=";
+				echo $HTML->encode(urlencode($_GET['id']));
 				echo "\">$start</a></td>
 				<td>$end</td>
 <!--

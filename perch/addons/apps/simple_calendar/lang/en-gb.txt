@@ -518,5 +518,6 @@
     "Previous": "Previous",
     "Next": "Next",
     "Month": "Month",
-    "Year": "Year"
+    "Year": "Year",
+    "Unit pricing updated - <a href=\"\/perch\/addons\/apps\/simple_calendar\/accommodation\/units\/edit\/?id=14\">return to unit<\/a>": "Unit pricing updated - <a href=\"\/perch\/addons\/apps\/simple_calendar\/accommodation\/units\/edit\/?id=14\">return to unit<\/a>"
 }

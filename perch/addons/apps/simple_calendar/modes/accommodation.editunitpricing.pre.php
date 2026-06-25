@@ -16,6 +16,6 @@
 		
 		$data = $_POST;
 		$SimpleCalendar->updateunitPrice($data);	
-		$message = $HTML->success_message('Unit pricing updated');  
+		$message = $HTML->success_message('Unit pricing updated - <a href="/perch/addons/apps/simple_calendar/accommodation/units/edit/?id='.$_GET['unit'].'">return to unit</a>');  
     	    
     }
