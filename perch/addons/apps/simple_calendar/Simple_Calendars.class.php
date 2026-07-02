@@ -382,27 +382,61 @@ class Simple_Calendars extends PerchAPI_Factory
     // report money actually received instead of gross booking value.
     public function getMonthlySalesByUnit($rangeStart,$rangeEnd){
 
-		// For each booking: if it used a voucher, count the voucher's value (looked
-		// up from simple_calendar_vouchers by the code(s) stored in the "voucher"
-		// column, which may be comma-separated); otherwise count what was paid.
-		$sql = 'SELECT b.unitID, COUNT(*) AS bookings,
-					SUM(CASE
-						WHEN b.voucher IS NOT NULL AND b.voucher != "" THEN
-							(SELECT COALESCE(SUM(v.voucherValue), 0)
-							   FROM simple_calendar_vouchers v
-							  WHERE FIND_IN_SET(v.voucherCode, b.voucher))
-						ELSE b.paid
-					END) AS total
-				FROM simple_calendar_accommodation_bookings b
-				WHERE b.startTime >= "'.$rangeStart.'" AND b.endTime <= "'.$rangeEnd.'" AND (b.reference = "" OR b.reference IS NULL)
-				GROUP BY b.unitID';
-		
-		echo $sql;
+		// Value each booking from the pricing table (weekday = onenight,
+		// weekend = twonights) rather than the stored cost/paid, mirroring the
+		// front-end getPriceValue() calculation. Bookings are attributed to the
+		// month of their arrival date (startTime).
+		$sql = 'SELECT unitID, startTime, endTime FROM simple_calendar_accommodation_bookings
+				WHERE startTime >= "'.$rangeStart.'" AND startTime <= "'.$rangeEnd.'" AND (reference = "" OR reference IS NULL)
+				ORDER BY unitID';
+		$bookings = $this->db->get_rows($sql);
 
-		$data = $this->db->get_rows($sql);
+		// Load all pricing rows once (small table), indexed by unit.
+		$pricingByUnit = array();
+		foreach($this->db->get_rows('SELECT unitID, startDate, endDate, onenight, twonights FROM simple_calendar_accommodation_unit_pricing') as $p){
+			$pricingByUnit[$p['unitID']][] = $p;
+		}
 
-	    return $data;
+		$summary = array();
+		foreach($bookings as $booking){
+			$unitID = $booking['unitID'];
+			if(!isset($summary[$unitID])){
+				$summary[$unitID] = array('unitID' => $unitID, 'bookings' => 0, 'total' => 0);
+			}
+			$summary[$unitID]['bookings']++;
+			$summary[$unitID]['total'] += $this->bookingValueFromPricing($booking['startTime'], $booking['endTime'], $unitID, $pricingByUnit);
+		}
 
+		return array_values($summary);
+
+    }
+
+    // Value of a single booking from the pricing table: for every day of the stay
+    // (arrival through departure inclusive) add the weekend rate (twonights) on a
+    // Sat/Sun or the weekday rate (onenight) otherwise, from the pricing row that
+    // covers that date. Mirrors the front-end getPriceValue() logic.
+    public function bookingValueFromPricing($startTime, $endTime, $unitID, $pricingByUnit){
+	    $arrival   = substr($startTime, 0, 10);
+	    $departure = substr($endTime, 0, 10);
+	    $days = (int) round((strtotime($departure) - strtotime($arrival)) / 86400) + 1;
+	    if($days < 1){ $days = 1; }
+
+	    $a = explode('-', $arrival);
+	    $total = 0;
+	    for($i = 0; $i < $days; $i++){
+		    $ts      = mktime(0, 0, 0, (int)$a[1], (int)$a[2] + $i, (int)$a[0]);
+		    $date    = date('Y-m-d', $ts);
+		    $weekend = in_array(date('D', $ts), array('Sat', 'Sun'));
+		    if(isset($pricingByUnit[$unitID])){
+			    foreach($pricingByUnit[$unitID] as $p){
+				    if($p['startDate'] <= $date && $p['endDate'] >= $date){
+					    $total += $weekend ? (float)$p['twonights'] : (float)$p['onenight'];
+					    break;
+				    }
+			    }
+		    }
+	    }
+	    return $total;
     }
     
     public function getFutureBookings(){
