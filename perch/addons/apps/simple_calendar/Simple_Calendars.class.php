@@ -382,11 +382,14 @@ class Simple_Calendars extends PerchAPI_Factory
     // report money actually received instead of gross booking value.
     public function getMonthlySalesByUnit($rangeStart,$rangeEnd){
 
+		$this->ensurePromoSchema(); // ensure promocodes table + bookings.promoCode column exist
+
 		// Value each booking from the pricing table (weekday = onenight,
 		// weekend = twonights) rather than the stored cost/paid, mirroring the
 		// front-end getPriceValue() calculation. Bookings are attributed to the
-		// month of their arrival date (startTime).
-		$sql = 'SELECT unitID, startTime, endTime FROM simple_calendar_accommodation_bookings
+		// month of their arrival date (startTime); promo-code discounts are then
+		// subtracted below.
+		$sql = 'SELECT unitID, startTime, endTime, promoCode FROM simple_calendar_accommodation_bookings
 				WHERE startTime >= "'.$rangeStart.'" AND startTime <= "'.$rangeEnd.'" AND (reference = "" OR reference IS NULL)
 				ORDER BY unitID';
 		$bookings = $this->db->get_rows($sql);
@@ -397,14 +400,28 @@ class Simple_Calendars extends PerchAPI_Factory
 			$pricingByUnit[$p['unitID']][] = $p;
 		}
 
+		// Load promo-code percentages once, keyed by lower-cased code.
+		$promoPercent = array();
+		foreach($this->db->get_rows('SELECT name, percentage FROM simple_calendar_promocodes') as $pr){
+			$promoPercent[strtolower(trim($pr['name']))] = (float) $pr['percentage'];
+		}
+
 		$summary = array();
 		foreach($bookings as $booking){
 			$unitID = $booking['unitID'];
 			if(!isset($summary[$unitID])){
 				$summary[$unitID] = array('unitID' => $unitID, 'bookings' => 0, 'total' => 0);
 			}
+			$value = $this->bookingValueFromPricing($booking['startTime'], $booking['endTime'], $unitID, $pricingByUnit);
+
+			// Subtract any promotional-code discount (a percentage off the value).
+			$code = isset($booking['promoCode']) ? strtolower(trim($booking['promoCode'])) : '';
+			if($code != '' && isset($promoPercent[$code]) && $promoPercent[$code] > 0){
+				$value -= $value * ($promoPercent[$code] / 100);
+			}
+
 			$summary[$unitID]['bookings']++;
-			$summary[$unitID]['total'] += $this->bookingValueFromPricing($booking['startTime'], $booking['endTime'], $unitID, $pricingByUnit);
+			$summary[$unitID]['total'] += $value;
 		}
 
 		return array_values($summary);
