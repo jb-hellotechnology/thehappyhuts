@@ -382,7 +382,7 @@ class Simple_Calendars extends PerchAPI_Factory
     // report money actually received instead of gross booking value.
     public function getMonthlySalesByUnit($rangeStart,$rangeEnd){
 
-		$sql = 'SELECT unitID, COUNT(*) AS bookings, SUM(cost) AS total FROM simple_calendar_accommodation_bookings WHERE startTime>="'.$rangeStart.'" AND startTime<="'.$rangeEnd.'" AND (reference="" OR reference IS NULL) GROUP BY unitID';
+		$sql = 'SELECT unitID, COUNT(*) AS bookings, SUM(paid) AS total FROM simple_calendar_accommodation_bookings WHERE startTime>="'.$rangeStart.'" AND startTime<="'.$rangeEnd.'" AND (reference="" OR reference IS NULL) GROUP BY unitID';
 
 		$data = $this->db->get_rows($sql);
 
