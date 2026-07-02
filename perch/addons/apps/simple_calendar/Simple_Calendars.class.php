@@ -390,7 +390,7 @@ class Simple_Calendars extends PerchAPI_Factory
 		// month of their arrival date (startTime); promo-code discounts are then
 		// subtracted below.
 		$sql = 'SELECT unitID, startTime, endTime, promoCode FROM simple_calendar_accommodation_bookings
-				WHERE startTime >= "'.$rangeStart.'" AND startTime <= "'.$rangeEnd.'" AND (reference = "" OR reference IS NULL)
+				WHERE startTime >= "'.$rangeStart.'" AND endTime <= "'.$rangeEnd.'" AND (reference = "" OR reference IS NULL)
 				ORDER BY unitID';
 		$bookings = $this->db->get_rows($sql);
 
@@ -413,9 +413,9 @@ class Simple_Calendars extends PerchAPI_Factory
 				$summary[$unitID] = array('unitID' => $unitID, 'bookings' => 0, 'total' => 0);
 			}
 			$value = $this->bookingValueFromPricing($booking['startTime'], $booking['endTime'], $unitID, $pricingByUnit);
-
 			// Subtract any promotional-code discount (a percentage off the value).
 			$code = isset($booking['promoCode']) ? strtolower(trim($booking['promoCode'])) : '';
+			echo $booking['promoCode'];
 			if($code != '' && isset($promoPercent[$code]) && $promoPercent[$code] > 0){
 				$value -= $value * ($promoPercent[$code] / 100);
 			}
