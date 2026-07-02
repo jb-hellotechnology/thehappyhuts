@@ -394,8 +394,10 @@ class Simple_Calendars extends PerchAPI_Factory
 						ELSE b.paid
 					END) AS total
 				FROM simple_calendar_accommodation_bookings b
-				WHERE b.startTime >= "'.$rangeStart.'" AND b.startTime <= "'.$rangeEnd.'" AND (b.reference = "" OR b.reference IS NULL)
+				WHERE b.startTime >= "'.$rangeStart.'" AND b.endTime <= "'.$rangeEnd.'" AND (b.reference = "" OR b.reference IS NULL)
 				GROUP BY b.unitID';
+		
+		echo $sql;
 
 		$data = $this->db->get_rows($sql);
 
