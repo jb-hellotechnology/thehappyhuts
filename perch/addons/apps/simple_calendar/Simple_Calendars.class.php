@@ -415,7 +415,6 @@ class Simple_Calendars extends PerchAPI_Factory
 			$value = $this->bookingValueFromPricing($booking['startTime'], $booking['endTime'], $unitID, $pricingByUnit);
 			// Subtract any promotional-code discount (a percentage off the value).
 			$code = isset($booking['promoCode']) ? strtolower(trim($booking['promoCode'])) : '';
-			echo $booking['promoCode'];
 			if($code != '' && isset($promoPercent[$code]) && $promoPercent[$code] > 0){
 				$value -= $value * ($promoPercent[$code] / 100);
 			}
