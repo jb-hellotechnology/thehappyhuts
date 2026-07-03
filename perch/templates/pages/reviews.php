@@ -25,12 +25,12 @@ if($_GET['p']=='saltyseadog'){
 	
 	print_r($departures);
 
-	foreach($depatures as $depatures){
+	foreach($depatures as $depature){
 		
-		$firstName = addslashes($arrival['firstName']);
+		$firstName = addslashes($depatures['firstName']);
 		
 		$placeHolders = array("{{memberName}}");
-		$emailContent = array($arrival['firstName']);
+		$emailContent = array($depature['firstName']);
 		
 		$message = str_replace(
 			$placeHolders,
@@ -42,7 +42,7 @@ if($_GET['p']=='saltyseadog'){
 			'subject' => 'The Happy Huts - Review Us',
 		    'sender' => ['name' => 'The Happy Huts', 'email' => 'office@thehappyhuts.co.uk'],
 		    'replyTo' => ['name' => 'The Happy Huts', 'email' => 'office@thehappyhuts.co.uk'],
-		    'to' => [[ 'name' => "$arrival[firstName]", 'email' => "jack@hellotechnology.co.uk"]],
+		    'to' => [[ 'name' => "$depatures[firstName]", 'email' => "jack@hellotechnology.co.uk"]],
 		    'htmlContent' => $message
 		]);
 		
