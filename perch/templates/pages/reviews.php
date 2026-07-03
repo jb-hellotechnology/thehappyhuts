@@ -40,7 +40,7 @@ if($_GET['p']=='saltyseadog'){
 			'subject' => 'The Happy Huts - Review Us',
 		    'sender' => ['name' => 'The Happy Huts', 'email' => 'office@thehappyhuts.co.uk'],
 		    'replyTo' => ['name' => 'The Happy Huts', 'email' => 'office@thehappyhuts.co.uk'],
-		    'to' => [[ 'name' => "$arrival[firstName]", 'email' => "$arrival[emailAddress]"]],
+		    'to' => [[ 'name' => "$arrival[firstName]", 'email' => "$departure[emailAddress]"]],
 		    'htmlContent' => $message
 		]);
 		
