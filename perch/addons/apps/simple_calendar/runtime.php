@@ -1618,6 +1618,23 @@ function smsContentArrival(){
   return $smsData;
 }
 
+function reviewContent(){
+  $API = new Simple_Calendars($API);
+  $SimpleCalendar = new Simple_Calendars($API);
+
+  $smsData = $SimpleCalendar->getEmail(6);	
+  return $smsData;
+}
+
+function reviewDepatures(){
+	$API = new Simple_Calendars($API);
+	$SimpleCalendar = new Simple_Calendars($API);		
+	
+	$departures = $SimpleCalendar->reviewDepatures();
+	return $departures;
+	
+}
+
 function todayArrivals(){
 	$API = new Simple_Calendars($API);
 	$SimpleCalendar = new Simple_Calendars($API);		

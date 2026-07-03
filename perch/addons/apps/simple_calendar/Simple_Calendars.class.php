@@ -1083,6 +1083,14 @@ class Simple_Calendars extends PerchAPI_Factory
 	  return $data;
   }
   
+  public function reviewDepatures(){
+		$date = date("Y-m-d", strtotime("-2 days"));
+		$arrival = $date." 09:30:00";
+		$sql = 'SELECT * FROM simple_calendar_accommodation_bookings WHERE startTime="'.$arrival.'"';
+		$data = $this->db->get_rows($sql);
+		return $data;
+	}
+  
   public function deleteExpiredBookings(){
 	  global $stripe;
 	  $time = date("Y-m-d H:i:s", mktime(date('H'), date('i'), date('s')+10, date('m'), date('d'), date('Y')));
