@@ -22,8 +22,10 @@ if($_GET['p']=='saltyseadog'){
 	$reviewContent = reviewContent();
 	$review = nl2br($reviewContent['content']);
 	$departures = reviewDepatures();
+	
+	print_r($departures);
 
-	foreach($arrivals as $arrival){
+	foreach($depatures as $depatures){
 		
 		$firstName = addslashes($arrival['firstName']);
 		
