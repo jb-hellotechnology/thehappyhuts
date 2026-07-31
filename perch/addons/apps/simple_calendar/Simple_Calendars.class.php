@@ -389,7 +389,7 @@ class Simple_Calendars extends PerchAPI_Factory
 		// front-end getPriceValue() calculation. Bookings are attributed to the
 		// month of their arrival date (startTime); promo-code discounts are then
 		// subtracted below.
-		$sql = 'SELECT unitID, startTime, endTime, promoCode FROM simple_calendar_accommodation_bookings
+		$sql = 'SELECT unitID, startTime, endTime, promoCode, owner FROM simple_calendar_accommodation_bookings
 				WHERE startTime >= "'.$rangeStart.'" AND endTime <= "'.$rangeEnd.'" AND (reference = "" OR reference IS NULL)
 				ORDER BY unitID';
 		$bookings = $this->db->get_rows($sql);
@@ -412,11 +412,16 @@ class Simple_Calendars extends PerchAPI_Factory
 			if(!isset($summary[$unitID])){
 				$summary[$unitID] = array('unitID' => $unitID, 'bookings' => 0, 'total' => 0);
 			}
-			$value = $this->bookingValueFromPricing($booking['startTime'], $booking['endTime'], $unitID, $pricingByUnit);
-			// Subtract any promotional-code discount (a percentage off the value).
-			$code = isset($booking['promoCode']) ? strtolower(trim($booking['promoCode'])) : '';
-			if($code != '' && isset($promoPercent[$code]) && $promoPercent[$code] > 0){
-				$value -= $value * ($promoPercent[$code] / 100);
+			if(isset($booking['owner']) && $booking['owner'] == 'Yes'){
+				// Owner (blocked) booking — not a sale, so it counts as £0.
+				$value = 0;
+			}else{
+				$value = $this->bookingValueFromPricing($booking['startTime'], $booking['endTime'], $unitID, $pricingByUnit);
+				// Subtract any promotional-code discount (a percentage off the value).
+				$code = isset($booking['promoCode']) ? strtolower(trim($booking['promoCode'])) : '';
+				if($code != '' && isset($promoPercent[$code]) && $promoPercent[$code] > 0){
+					$value -= $value * ($promoPercent[$code] / 100);
+				}
 			}
 
 			$summary[$unitID]['bookings']++;
